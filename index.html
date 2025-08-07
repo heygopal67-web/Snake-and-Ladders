@@ -7,9 +7,15 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <div id="top-bar">
+    <span class="icon"><img src="apple.svg" alt="Apple" class="icon-img"></span>
+    <span id="food-count">0</span>
+    <span class="icon"><img src="trophy.svg" alt="Score" class="icon-img"></span>
+    <span id="score">0</span>
+    <span class="icon" id="sound-toggle"><img src="sound-on.svg" alt="Sound" class="icon-img"></span>
+  </div>
   <div id="game-container">
-    <div id="score">Score: 0</div>
-    <canvas id="gameCanvas" width="400" height="400"></canvas>
+    <canvas id="gameCanvas"></canvas>
     <button id="restartBtn" class="hidden">Restart</button>
     <div id="touch-controls" class="hidden">
       <button id="up">▲</button><br>
