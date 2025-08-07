@@ -217,8 +217,16 @@ document.getElementById('right').addEventListener('touchstart', e => { e.prevent
 });
 soundToggle.addEventListener('click', () => {
   soundOn = !soundOn;
-  soundToggle.innerHTML = soundOn ? '<img src="sound-on.svg" alt="Sound" class="icon-img">' : '<img src="sound-off.svg" alt="Muted" class="icon-img">';
+  soundToggle.innerHTML = soundOn
+    ? '<img src="sound-on.svg" alt="Sound" class="icon-img">'
+    : '<img src="sound-off.svg" alt="Muted" class="icon-img">';
   soundToggle.classList.add('sound-feedback');
+  // Play sound.wav on toggle
+  const toggleSound = document.getElementById('toggleSound');
+  if (toggleSound) {
+    toggleSound.currentTime = 0;
+    toggleSound.play();
+  }
   setTimeout(() => soundToggle.classList.remove('sound-feedback'), 180);
 });
 soundToggle.addEventListener('keydown', e => {
