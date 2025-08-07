@@ -56,17 +56,34 @@ canvas {
   margin: 0 auto;
 }
 #restartBtn {
-  margin-top: 10px;
-  padding: 8px 20px;
-  font-size: 1em;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  padding: 18px 38px;
+  font-size: 1.3em;
   border: none;
-  background: #333;
+  background: #3498db;
   color: #fff;
-  border-radius: 4px;
+  border-radius: 2em;
+  box-shadow: 0 4px 16px rgba(52,152,219,0.2);
   cursor: pointer;
+  font-weight: bold;
+  letter-spacing: 1px;
+  transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+  outline: none;
+}
+#restartBtn:hover, #restartBtn:focus {
+  background: #217dbb;
+  box-shadow: 0 6px 24px rgba(52,152,219,0.3);
+  transform: translate(-50%, -52%) scale(1.04);
 }
 #restartBtn:active {
-  background: #444;
+  background: #17609c;
+}
+#restartBtn.hidden {
+  display: none !important;
 }
 #touch-controls {
   margin-top: 15px;
@@ -87,9 +104,57 @@ canvas {
 #touch-controls button:active {
   background: #ccc;
 }
+#sound-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.2em;
+  height: 2.2em;
+  border-radius: 50%;
+  background: #fff2;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 8px rgba(52,152,219,0.08);
+  margin-left: auto;
+  outline: none;
+}
+#sound-toggle:focus {
+  background: #fff4;
+  box-shadow: 0 0 0 2px #3498db55;
+}
+#sound-toggle:hover {
+  background: #fff4;
+}
+#sound-toggle:active {
+  background: #3498db22;
+}
+#sound-toggle .icon-img {
+  width: 1.3em;
+  height: 1.3em;
+}
 .hidden {
   display: none !important;
 }
 ::-webkit-scrollbar {
   display: none;
+}
+@keyframes pop {
+  0% { transform: translate(-50%, -50%) scale(0.7); opacity: 0.5; }
+  60% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+#restartBtn.pop {
+  animation: pop 0.35s cubic-bezier(.4,2,.6,1) 1;
+}
+#sound-toggle.sound-feedback {
+  animation: sound-bounce 0.18s cubic-bezier(.4,2,.6,1) 1;
+}
+@keyframes sound-bounce {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.18); }
+  100% { transform: scale(1); }
+}
+#sound-toggle.focus {
+  box-shadow: 0 0 0 3px #3498db88;
+  background: #fff6;
 }
