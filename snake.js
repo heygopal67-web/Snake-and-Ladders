@@ -6,6 +6,10 @@ const restartBtn = document.getElementById('restartBtn');
 const touchControls = document.getElementById('touch-controls');
 const eatSound = document.getElementById('eatSound');
 const soundToggle = document.getElementById('sound-toggle');
+const nameModal = document.getElementById('name-modal');
+const playerNameInput = document.getElementById('playerNameInput');
+const startGameBtn = document.getElementById('startGameBtn');
+const playerNameEl = document.getElementById('playerName');
 
 const appleImg = new Image();
 appleImg.src = 'apple.svg';
@@ -13,6 +17,45 @@ appleImg.src = 'apple.svg';
 let gridSize = 20;
 let tileCount = 20;
 let snake, direction, food, score, foodCount, gameOver, speed, moveQueue, intervalId, soundOn;
+let playerName = '';
+
+function showNameModal() {
+  nameModal.style.display = 'flex';
+  playerNameInput.value = '';
+  setTimeout(() => playerNameInput.focus(), 100);
+}
+function hideNameModal() {
+  nameModal.style.display = 'none';
+}
+function setPlayerName(name) {
+  playerName = name.trim().slice(0, 16) || 'Player';
+  playerNameEl.textContent = playerName;
+  sessionStorage.setItem('snakePlayerName', playerName);
+}
+function checkName() {
+  let stored = sessionStorage.getItem('snakePlayerName');
+  if (stored) {
+    setPlayerName(stored);
+    hideNameModal();
+    resetGame();
+  } else {
+    showNameModal();
+  }
+}
+startGameBtn.addEventListener('click', () => {
+  if (playerNameInput.value.trim()) {
+    setPlayerName(playerNameInput.value);
+    hideNameModal();
+    resetGame();
+  } else {
+    playerNameInput.focus();
+  }
+});
+playerNameInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    startGameBtn.click();
+  }
+});
 
 function resizeCanvas() {
   const container = document.getElementById('game-container');
@@ -142,6 +185,7 @@ function setDirection(dx, dy) {
   moveQueue.push({ x: dx, y: dy });
 }
 document.addEventListener('keydown', e => {
+  if (nameModal.style.display !== 'none') return;
   if (gameOver && (e.key === 'Enter' || e.key === ' ')) {
     resetGame();
     return;
@@ -185,4 +229,6 @@ soundToggle.addEventListener('keydown', e => {
 });
 soundToggle.addEventListener('focus', () => soundToggle.classList.add('focus')); 
 soundToggle.addEventListener('blur', () => soundToggle.classList.remove('focus'));
-resetGame();
+
+// On load, check for name and show modal if needed
+window.addEventListener('DOMContentLoaded', checkName);

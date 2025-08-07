@@ -158,3 +158,65 @@ canvas {
   box-shadow: 0 0 0 3px #3498db88;
   background: #fff6;
 }
+.modal {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(60, 120, 60, 0.85);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal-content {
+  background: #fff;
+  border-radius: 1em;
+  padding: 2em 2.5em 1.5em 2.5em;
+  box-shadow: 0 8px 32px rgba(52,152,219,0.18);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 260px;
+}
+.modal-content h2 {
+  margin-top: 0;
+  color: #3498db;
+  font-size: 1.5em;
+  margin-bottom: 1em;
+}
+#playerNameInput {
+  font-size: 1.1em;
+  padding: 0.5em 1em;
+  border-radius: 0.5em;
+  border: 1.5px solid #b6f36b;
+  margin-bottom: 1em;
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+  transition: border 0.2s;
+}
+#playerNameInput:focus {
+  border: 1.5px solid #3498db;
+}
+#startGameBtn {
+  background: #3498db;
+  color: #fff;
+  border: none;
+  border-radius: 1.5em;
+  padding: 0.7em 2em;
+  font-size: 1.1em;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+#startGameBtn:hover, #startGameBtn:focus {
+  background: #217dbb;
+}
+.player-name {
+  font-weight: bold;
+  color: #fff;
+  margin-right: 1.2em;
+  font-size: 1.1em;
+  letter-spacing: 0.5px;
+  min-width: 60px;
+  text-shadow: 0 1px 2px #4e944f88;
+}
