@@ -1,33 +1,59 @@
-body {
+html, body {
+  height: 100%;
   margin: 0;
   padding: 0;
-  background: #fafafa;
+  background: #6ab04c;
+  width: 100vw;
+  overflow: hidden;
+}
+body {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+}
+#top-bar {
+  width: 100vw;
+  background: #4e944f;
+  color: #fff;
+  display: flex;
   align-items: center;
-  min-height: 100vh;
-  font-family: sans-serif;
+  padding: 0.5em 1em;
+  font-size: 1.5em;
+  gap: 0.7em;
+  box-sizing: border-box;
+  height: 3em;
+  user-select: none;
+}
+.icon {
+  display: flex;
+  align-items: center;
+}
+.icon-img {
+  width: 1.5em;
+  height: 1.5em;
+  vertical-align: middle;
 }
 #game-container {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-}
-#score {
-  font-size: 1.5em;
-  margin-bottom: 10px;
+  justify-content: center;
+  width: 100vw;
+  height: calc(100vh - 3em);
+  position: relative;
 }
 canvas {
-  background: #222;
-  border: 2px solid #333;
-  max-width: 90vw;
-  max-height: 60vw;
-  width: 400px;
-  height: 400px;
-  box-sizing: border-box;
-}
-.hidden {
-  display: none !important;
+  background: repeating-linear-gradient(45deg, #a3e635 0 20px, #b6f36b 20px 40px);
+  box-shadow: 0 0 0 8px #4e944f;
+  border-radius: 12px;
+  display: block;
+  width: 90vw;
+  height: 90vw;
+  max-width: 700px;
+  max-height: 70vh;
+  margin: 0 auto;
 }
 #restartBtn {
   margin-top: 10px;
@@ -61,14 +87,9 @@ canvas {
 #touch-controls button:active {
   background: #ccc;
 }
-@media (max-width: 500px) {
-  canvas {
-    width: 95vw;
-    height: 95vw;
-    max-width: 95vw;
-    max-height: 95vw;
-  }
-  #score {
-    font-size: 1.1em;
-  }
+.hidden {
+  display: none !important;
+}
+::-webkit-scrollbar {
+  display: none;
 }
