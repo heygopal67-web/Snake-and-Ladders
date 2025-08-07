@@ -1,16 +1,32 @@
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const scoreEl = document.getElementById('score');
+const foodCountEl = document.getElementById('food-count');
 const restartBtn = document.getElementById('restartBtn');
 const touchControls = document.getElementById('touch-controls');
 const eatSound = document.getElementById('eatSound');
+const soundToggle = document.getElementById('sound-toggle');
 
-const gridSize = 20;
-const tileCount = canvas.width / gridSize;
+const appleImg = new Image();
+appleImg.src = 'apple.svg';
 
-let snake, direction, food, score, gameOver, speed, moveQueue, intervalId;
+let gridSize = 20;
+let tileCount = 20;
+let snake, direction, food, score, foodCount, gameOver, speed, moveQueue, intervalId, soundOn;
+
+function resizeCanvas() {
+  // Fit canvas to container, keep square
+  const container = document.getElementById('game-container');
+  const size = Math.min(container.offsetWidth, container.offsetHeight);
+  canvas.width = size;
+  canvas.height = size;
+  gridSize = Math.floor(size / tileCount);
+  draw();
+}
+window.addEventListener('resize', resizeCanvas);
 
 function resetGame() {
+  tileCount = 20;
   snake = [
     { x: 8, y: 10 },
     { x: 7, y: 10 },
@@ -20,12 +36,16 @@ function resetGame() {
   moveQueue = [];
   food = randomFood();
   score = 0;
+  foodCount = 0;
   speed = 150;
   gameOver = false;
-  scoreEl.textContent = 'Score: ' + score;
+  soundOn = true;
+  scoreEl.textContent = score;
+  foodCountEl.textContent = foodCount;
   restartBtn.classList.add('hidden');
   if (intervalId) clearInterval(intervalId);
   intervalId = setInterval(gameLoop, speed);
+  resizeCanvas();
 }
 
 function randomFood() {
@@ -41,13 +61,10 @@ function randomFood() {
 }
 
 function gameLoop() {
-  // Move
   if (moveQueue.length) {
     direction = moveQueue.shift();
   }
   const head = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
-
-  // Wall or self collision
   if (
     head.x < 0 || head.x >= tileCount ||
     head.y < 0 || head.y >= tileCount ||
@@ -58,51 +75,74 @@ function gameLoop() {
     restartBtn.classList.remove('hidden');
     return;
   }
-
   snake.unshift(head);
-
-  // Eat food
   if (head.x === food.x && head.y === food.y) {
     score++;
-    scoreEl.textContent = 'Score: ' + score;
+    foodCount++;
+    scoreEl.textContent = score;
+    foodCountEl.textContent = foodCount;
     food = randomFood();
-    eatSound.currentTime = 0;
-    eatSound.play();
-    // Speed up
+    if (soundOn) {
+      eatSound.currentTime = 0;
+      eatSound.play();
+    }
     speed = Math.max(60, speed - 7);
     clearInterval(intervalId);
     intervalId = setInterval(gameLoop, speed);
   } else {
     snake.pop();
   }
-
   draw();
 }
 
 function draw() {
-  ctx.fillStyle = '#222';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-  // Draw food
-  ctx.fillStyle = '#e74c3c';
-  ctx.fillRect(food.x * gridSize, food.y * gridSize, gridSize, gridSize);
-
-  // Draw snake
-  ctx.fillStyle = '#2ecc40';
+  // Draw checkered board
+  for (let y = 0; y < tileCount; y++) {
+    for (let x = 0; x < tileCount; x++) {
+      ctx.fillStyle = (x + y) % 2 === 0 ? '#a3e635' : '#b6f36b';
+      ctx.fillRect(x * gridSize, y * gridSize, gridSize, gridSize);
+    }
+  }
+  // Draw food (apple)
+  if (appleImg.complete) {
+    ctx.drawImage(appleImg, food.x * gridSize, food.y * gridSize, gridSize, gridSize);
+  } else {
+    ctx.fillStyle = '#e74c3c';
+    ctx.beginPath();
+    ctx.arc(food.x * gridSize + gridSize/2, food.y * gridSize + gridSize/2, gridSize/2.2, 0, 2 * Math.PI);
+    ctx.fill();
+  }
+  // Draw snake (blue, with eyes on head)
   snake.forEach((seg, i) => {
-    ctx.fillRect(seg.x * gridSize, seg.y * gridSize, gridSize, gridSize);
+    ctx.fillStyle = i === 0 ? '#3498db' : '#2980b9';
+    ctx.beginPath();
+    ctx.roundRect(seg.x * gridSize, seg.y * gridSize, gridSize, gridSize, gridSize/3);
+    ctx.fill();
+    // Eyes on head
+    if (i === 0) {
+      ctx.fillStyle = '#fff';
+      let eyeOffsetX = direction.x === 0 ? gridSize/4 : direction.x > 0 ? gridSize/2.5 : -gridSize/8;
+      let eyeOffsetY = direction.y === 0 ? gridSize/4 : direction.y > 0 ? gridSize/2.5 : -gridSize/8;
+      ctx.beginPath();
+      ctx.arc(seg.x * gridSize + gridSize/2 - eyeOffsetX, seg.y * gridSize + gridSize/2 - eyeOffsetY, gridSize/7, 0, 2 * Math.PI);
+      ctx.arc(seg.x * gridSize + gridSize/2 + eyeOffsetX, seg.y * gridSize + gridSize/2 + eyeOffsetY, gridSize/7, 0, 2 * Math.PI);
+      ctx.fill();
+      ctx.fillStyle = '#222';
+      ctx.beginPath();
+      ctx.arc(seg.x * gridSize + gridSize/2 - eyeOffsetX, seg.y * gridSize + gridSize/2 - eyeOffsetY, gridSize/16, 0, 2 * Math.PI);
+      ctx.arc(seg.x * gridSize + gridSize/2 + eyeOffsetX, seg.y * gridSize + gridSize/2 + eyeOffsetY, gridSize/16, 0, 2 * Math.PI);
+      ctx.fill();
+    }
   });
 }
 
 function setDirection(dx, dy) {
-  // Prevent reverse
   if (snake.length > 1) {
     const next = { x: snake[0].x + dx, y: snake[0].y + dy };
     if (next.x === snake[1].x && next.y === snake[1].y) return;
   }
   moveQueue.push({ x: dx, y: dy });
 }
-
 document.addEventListener('keydown', e => {
   if (gameOver && (e.key === 'Enter' || e.key === ' ')) {
     resetGame();
@@ -115,10 +155,7 @@ document.addEventListener('keydown', e => {
     case 'ArrowRight': setDirection(1, 0); break;
   }
 });
-
 restartBtn.addEventListener('click', resetGame);
-
-// Touch controls for mobile
 function showTouchControls() {
   if (window.innerWidth < 600) {
     touchControls.classList.remove('hidden');
@@ -128,15 +165,15 @@ function showTouchControls() {
 }
 window.addEventListener('resize', showTouchControls);
 showTouchControls();
-
 document.getElementById('up').addEventListener('touchstart', e => { e.preventDefault(); setDirection(0, -1); });
 document.getElementById('down').addEventListener('touchstart', e => { e.preventDefault(); setDirection(0, 1); });
 document.getElementById('left').addEventListener('touchstart', e => { e.preventDefault(); setDirection(-1, 0); });
 document.getElementById('right').addEventListener('touchstart', e => { e.preventDefault(); setDirection(1, 0); });
-
-// Prevent scrolling on touch controls
 ['up','down','left','right'].forEach(id => {
   document.getElementById(id).addEventListener('touchmove', e => e.preventDefault());
 });
-
+soundToggle.addEventListener('click', () => {
+  soundOn = !soundOn;
+  soundToggle.innerHTML = soundOn ? '<img src="sound-on.svg" alt="Sound" class="icon-img">' : '<img src="sound-off.svg" alt="Muted" class="icon-img">';
+});
 resetGame();
