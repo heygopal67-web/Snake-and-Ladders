@@ -15,7 +15,6 @@ let tileCount = 20;
 let snake, direction, food, score, foodCount, gameOver, speed, moveQueue, intervalId, soundOn;
 
 function resizeCanvas() {
-  // Fit canvas to container, keep square
   const container = document.getElementById('game-container');
   const size = Math.min(container.offsetWidth, container.offsetHeight);
   canvas.width = size;
@@ -43,6 +42,7 @@ function resetGame() {
   scoreEl.textContent = score;
   foodCountEl.textContent = foodCount;
   restartBtn.classList.add('hidden');
+  restartBtn.classList.remove('pop');
   if (intervalId) clearInterval(intervalId);
   intervalId = setInterval(gameLoop, speed);
   resizeCanvas();
@@ -73,6 +73,8 @@ function gameLoop() {
     gameOver = true;
     clearInterval(intervalId);
     restartBtn.classList.remove('hidden');
+    restartBtn.classList.add('pop');
+    restartBtn.focus();
     return;
   }
   snake.unshift(head);
@@ -96,14 +98,12 @@ function gameLoop() {
 }
 
 function draw() {
-  // Draw checkered board
   for (let y = 0; y < tileCount; y++) {
     for (let x = 0; x < tileCount; x++) {
       ctx.fillStyle = (x + y) % 2 === 0 ? '#a3e635' : '#b6f36b';
       ctx.fillRect(x * gridSize, y * gridSize, gridSize, gridSize);
     }
   }
-  // Draw food (apple)
   if (appleImg.complete) {
     ctx.drawImage(appleImg, food.x * gridSize, food.y * gridSize, gridSize, gridSize);
   } else {
@@ -112,13 +112,11 @@ function draw() {
     ctx.arc(food.x * gridSize + gridSize/2, food.y * gridSize + gridSize/2, gridSize/2.2, 0, 2 * Math.PI);
     ctx.fill();
   }
-  // Draw snake (blue, with eyes on head)
   snake.forEach((seg, i) => {
     ctx.fillStyle = i === 0 ? '#3498db' : '#2980b9';
     ctx.beginPath();
     ctx.roundRect(seg.x * gridSize, seg.y * gridSize, gridSize, gridSize, gridSize/3);
     ctx.fill();
-    // Eyes on head
     if (i === 0) {
       ctx.fillStyle = '#fff';
       let eyeOffsetX = direction.x === 0 ? gridSize/4 : direction.x > 0 ? gridSize/2.5 : -gridSize/8;
@@ -156,6 +154,7 @@ document.addEventListener('keydown', e => {
   }
 });
 restartBtn.addEventListener('click', resetGame);
+restartBtn.addEventListener('animationend', () => restartBtn.classList.remove('pop'));
 function showTouchControls() {
   if (window.innerWidth < 600) {
     touchControls.classList.remove('hidden');
@@ -175,5 +174,15 @@ document.getElementById('right').addEventListener('touchstart', e => { e.prevent
 soundToggle.addEventListener('click', () => {
   soundOn = !soundOn;
   soundToggle.innerHTML = soundOn ? '<img src="sound-on.svg" alt="Sound" class="icon-img">' : '<img src="sound-off.svg" alt="Muted" class="icon-img">';
+  soundToggle.classList.add('sound-feedback');
+  setTimeout(() => soundToggle.classList.remove('sound-feedback'), 180);
 });
+soundToggle.addEventListener('keydown', e => {
+  if (e.key === 'Enter' || e.key === ' ') {
+    e.preventDefault();
+    soundToggle.click();
+  }
+});
+soundToggle.addEventListener('focus', () => soundToggle.classList.add('focus')); 
+soundToggle.addEventListener('blur', () => soundToggle.classList.remove('focus'));
 resetGame();
